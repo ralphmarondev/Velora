@@ -1,6 +1,7 @@
 package com.ralphmarondev.velora.features.dashboard.presentation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -63,14 +64,25 @@ fun DashboardScreen(
                 },
                 actions = {
                     IconButton(onClick = { action(DashboardAction.NavigateToProfile) }) {
-                        Image(
-                            painter = rememberAsyncImagePainter(R.drawable.profile),
-                            contentDescription = "Profile",
+                        Box(
                             modifier = Modifier
-                                .size(38.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
+                                .size(42.dp)
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
+                                    shape = CircleShape
+                                )
+                                .padding(2.dp)
+                        ) {
+                            Image(
+                                painter = rememberAsyncImagePainter(R.drawable.profile),
+                                contentDescription = "Profile",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

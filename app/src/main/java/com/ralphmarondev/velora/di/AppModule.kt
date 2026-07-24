@@ -6,6 +6,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.ralphmarondev.velora.core.di.coreModule
 import com.ralphmarondev.velora.features.auth.di.authModule
 import com.ralphmarondev.velora.features.dashboard.di.dashboardModule
+import com.ralphmarondev.velora.receiver.NotificationHelper
+import com.ralphmarondev.velora.receiver.TrafficListener
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val appModule = module {
@@ -16,4 +19,6 @@ val appModule = module {
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
     single { FirebaseDatabase.getInstance() }
+    singleOf(::NotificationHelper)
+    singleOf(::TrafficListener)
 }

@@ -15,4 +15,5 @@ captures/
 
 # Local and sensitive files
 *.jks
+*.keystore
 local.properties

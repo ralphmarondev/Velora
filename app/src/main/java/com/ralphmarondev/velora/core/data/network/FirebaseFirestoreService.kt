@@ -37,4 +37,15 @@ class FirebaseFirestoreService(
         )
         return user
     }
+
+    suspend fun updateUser(user: User) {
+        fireStore.collection("users")
+            .document(user.uid)
+            .update(
+                mapOf(
+                    "displayName" to user.displayName,
+                    "imagePath" to user.imagePath
+                )
+            )
+    }
 }

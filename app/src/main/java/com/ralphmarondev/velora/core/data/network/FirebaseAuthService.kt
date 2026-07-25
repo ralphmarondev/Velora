@@ -1,6 +1,7 @@
 package com.ralphmarondev.velora.core.data.network
 
 import android.util.Log
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 
@@ -29,5 +30,22 @@ class FirebaseAuthService(
             "Register UID: `${firebaseUser?.uid}`, email: `${firebaseUser?.email}`"
         )
         return firebaseUser?.uid
+    }
+
+    suspend fun updatePassword(
+        currentEmail: String,
+        currentPassword: String,
+        newPassword: String
+    ) {
+        val user = firebaseAuth.currentUser
+            ?: throw Exception("No authenticated user.")
+
+        val credential = EmailAuthProvider.getCredential(currentEmail, currentPassword)
+        user.reauthenticate(credential).await()
+        user.updatePassword(newPassword).await()
+    }
+
+    fun logout() {
+        firebaseAuth.signOut()
     }
 }

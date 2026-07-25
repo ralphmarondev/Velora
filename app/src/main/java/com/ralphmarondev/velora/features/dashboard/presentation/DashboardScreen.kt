@@ -75,7 +75,7 @@ fun DashboardScreen(
                                 .padding(2.dp)
                         ) {
                             Image(
-                                painter = rememberAsyncImagePainter(R.drawable.profile),
+                                painter = rememberAsyncImagePainter(R.drawable.profile_1),
                                 contentDescription = "Profile",
                                 modifier = Modifier
                                     .fillMaxSize()

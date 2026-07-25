@@ -34,9 +34,9 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     val uidNotEmpty = preferences.uid.first()?.isNotEmpty() == true
                     startDestination = if (uidNotEmpty) {
-                        Routes.Dashboard
-                    } else {
                         Routes.Home
+                    } else {
+                        Routes.Auth
                     }
                 }
 

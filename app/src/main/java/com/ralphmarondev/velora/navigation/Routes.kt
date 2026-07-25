@@ -19,4 +19,10 @@ sealed interface Routes {
 
     @Serializable
     data object Dashboard : Routes
+
+    @Serializable
+    data object Account : Routes
+
+    @Serializable
+    data object Profile : Routes
 }

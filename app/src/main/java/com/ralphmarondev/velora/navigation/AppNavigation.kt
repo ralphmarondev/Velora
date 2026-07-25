@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.ralphmarondev.velora.features.account.profile.ProfileScreenRoot
 import com.ralphmarondev.velora.features.auth.presentation.login.LoginScreenRoot
 import com.ralphmarondev.velora.features.auth.presentation.register.RegisterScreenRoot
 import com.ralphmarondev.velora.features.dashboard.presentation.DashboardScreenRoot
@@ -61,7 +62,28 @@ fun AppNavigation(
         ) {
             composable<Routes.Dashboard> {
                 DashboardScreenRoot(
-                    navigateToProfile = {}
+                    navigateToProfile = {
+                        navController.navigate(Routes.Account) {
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+        }
+
+        navigation<Routes.Account>(
+            startDestination = Routes.Profile
+        ) {
+            composable<Routes.Profile> {
+                ProfileScreenRoot(
+                    logout = {
+                        navController.navigate(Routes.Auth) {
+                            popUpTo(Routes.Home) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
                 )
             }
         }

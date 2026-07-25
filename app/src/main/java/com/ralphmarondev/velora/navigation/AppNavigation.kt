@@ -83,6 +83,9 @@ fun AppNavigation(
                             }
                             launchSingleTop = true
                         }
+                    },
+                    selectImage = {
+
                     }
                 )
             }

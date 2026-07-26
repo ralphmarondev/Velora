@@ -293,24 +293,29 @@ private fun DisplayNameDialog(
             }
         },
         title = {
-            Text(text = "Set Display Name")
+            Text(
+                text = "Update Display Name",
+                color = MaterialTheme.colorScheme.primary
+            )
         },
         text = {
-            Text(
-                text = "This name is only visible by you.",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.secondary
+            Column {
+                Text(
+                    text = "This name is only visible by you.",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            LumiTextField(
-                value = newDisplayName,
-                onValueChange = { newDisplayName = it },
-                placeHolderText = "Velora User",
-                labelText = "Display Name",
-                leadingIconImageVector = Icons.Outlined.ManageAccounts,
-                modifier = Modifier.fillMaxWidth()
-            )
+                Spacer(modifier = Modifier.height(16.dp))
+                LumiTextField(
+                    value = newDisplayName,
+                    onValueChange = { newDisplayName = it },
+                    placeHolderText = "Velora User",
+                    labelText = "Display Name",
+                    leadingIconImageVector = Icons.Outlined.ManageAccounts,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     )
 }
@@ -328,49 +333,54 @@ private fun EmailDialog(
             }
         },
         title = {
-            Text(text = "Email")
+            Text(
+                text = "View Email",
+                color = MaterialTheme.colorScheme.primary
+            )
         },
         text = {
-            Text(
-                text = "This email is used to sign in to your account. It can't be changed right now.",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.secondary
+            Column {
+                Text(
+                    text = "This email is used to sign in to your account. It can't be changed right now.",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = email,
-                onValueChange = {},
-                readOnly = true,
-                shape = RoundedCornerShape(20),
-                textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.secondary
-                ),
-                placeholder = {
-                    Text(
-                        text = "someone@example.com",
-                        color = MaterialTheme.colorScheme.secondary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                label = {
-                    Text(
-                        text = "Email",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                singleLine = true,
-                maxLines = 1,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Outlined.Email,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            )
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = {},
+                    readOnly = true,
+                    shape = RoundedCornerShape(20),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.secondary
+                    ),
+                    placeholder = {
+                        Text(
+                            text = "someone@example.com",
+                            color = MaterialTheme.colorScheme.secondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = "Email",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Email,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                )
+            }
         }
     )
 }
@@ -403,32 +413,37 @@ private fun PasswordDialog(
             }
         },
         title = {
-            Text(text = "Update Password")
+            Text(
+                text = "Update Password",
+                color = MaterialTheme.colorScheme.primary
+            )
         },
         text = {
-            Text(
-                text = "This password is used to sign in to Velora.",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.secondary
+            Column {
+                Text(
+                    text = "This password is used to sign in to Velora.",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            LumiTextField(
-                value = newPassword,
-                onValueChange = { newPassword = it },
-                placeHolderText = "New Password",
-                labelText = "New Password",
-                leadingIconImageVector = Icons.Outlined.Password,
-                modifier = Modifier.fillMaxWidth()
-            )
-            LumiTextField(
-                value = confirmNewPassword,
-                onValueChange = { confirmNewPassword = it },
-                placeHolderText = "Confirm Password",
-                labelText = "Confirm Password",
-                leadingIconImageVector = Icons.Outlined.Password,
-                modifier = Modifier.fillMaxWidth()
-            )
+                Spacer(modifier = Modifier.height(16.dp))
+                LumiTextField(
+                    value = newPassword,
+                    onValueChange = { newPassword = it },
+                    placeHolderText = "New Password",
+                    labelText = "New Password",
+                    leadingIconImageVector = Icons.Outlined.Password,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                LumiTextField(
+                    value = confirmNewPassword,
+                    onValueChange = { confirmNewPassword = it },
+                    placeHolderText = "Confirm Password",
+                    labelText = "Confirm Password",
+                    leadingIconImageVector = Icons.Outlined.Password,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     )
 }

@@ -7,4 +7,5 @@ sealed interface RegisterAction {
     data class EmailChange(val email: String) : RegisterAction
     data class PasswordChange(val password: String) : RegisterAction
     data class ConfirmPasswordChange(val confirmPassword: String) : RegisterAction
+    data object ClearNavigation : RegisterAction
 }

@@ -48,6 +48,10 @@ class RegisterViewModel(
                     confirmPassword = _state.value.confirmPassword.trim()
                 )
             }
+
+            RegisterAction.ClearNavigation -> {
+                _state.update { it.copy(navigateToLogin = false) }
+            }
         }
     }
 

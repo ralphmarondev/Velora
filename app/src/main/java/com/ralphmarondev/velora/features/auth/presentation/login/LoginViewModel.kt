@@ -35,6 +35,10 @@ class LoginViewModel(
             is LoginAction.PasswordChange -> {
                 _state.update { it.copy(password = action.password) }
             }
+
+            LoginAction.ClearNavigation -> {
+                _state.update { it.copy(navigateToRegister = false) }
+            }
         }
     }
 

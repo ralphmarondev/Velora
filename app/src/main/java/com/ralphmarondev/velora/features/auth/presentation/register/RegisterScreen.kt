@@ -50,6 +50,7 @@ fun RegisterScreenRoot(
     LaunchedEffect(state.navigateToLogin) {
         if (state.navigateToLogin) {
             onLogin()
+            viewModel.onAction(RegisterAction.ClearNavigation)
         }
     }
 

@@ -39,6 +39,7 @@ fun DashboardScreenRoot(
     LaunchedEffect(state.navigateToProfile) {
         if (state.navigateToProfile) {
             navigateToProfile()
+            viewModel.onAction(DashboardAction.ClearNavigation)
         }
     }
 

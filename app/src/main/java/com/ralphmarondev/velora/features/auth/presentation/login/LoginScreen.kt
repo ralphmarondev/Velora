@@ -105,7 +105,7 @@ private fun LoginScreen(
             item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Welcome Back, Meowmate!",
+                    text = "Welcome Back!",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
@@ -113,7 +113,7 @@ private fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Log in to share your soft thoughts and catch up on cozy meows.",
+                    text = "Stay informed with live traffic conditions and faster routes.",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Normal,
@@ -128,7 +128,7 @@ private fun LoginScreen(
                     onValueChange = { action(LoginAction.EmailChange(it)) },
                     leadingIconImageVector = Icons.Outlined.Email,
                     labelText = "Email",
-                    placeHolderText = "lumi@example.com",
+                    placeHolderText = "someone@example.com",
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,

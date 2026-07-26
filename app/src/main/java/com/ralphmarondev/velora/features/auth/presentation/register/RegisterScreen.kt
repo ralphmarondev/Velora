@@ -105,13 +105,13 @@ private fun RegisterScreen(
             item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Join Lumi Community",
+                    text = "Get Started with Velora",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Create an account to post meows.",
+                    text = "Create your account and enjoy real-time traffic updates wherever you go.",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Normal
@@ -124,7 +124,7 @@ private fun RegisterScreen(
                     onValueChange = { action(RegisterAction.DisplayNameChange(it)) },
                     leadingIconImageVector = Icons.Outlined.AccountTree,
                     labelText = "Display Name",
-                    placeHolderText = "Lumi User",
+                    placeHolderText = "Velora User",
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -139,7 +139,7 @@ private fun RegisterScreen(
                     onValueChange = { action(RegisterAction.EmailChange(it)) },
                     leadingIconImageVector = Icons.Outlined.Email,
                     labelText = "Email",
-                    placeHolderText = "lumi@example.org",
+                    placeHolderText = "someone@example.com",
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,

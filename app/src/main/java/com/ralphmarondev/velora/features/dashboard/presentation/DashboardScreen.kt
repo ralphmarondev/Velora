@@ -64,25 +64,35 @@ fun DashboardScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { action(DashboardAction.NavigateToProfile) }) {
-                        Box(
-                            modifier = Modifier
-                                .size(42.dp)
-                                .border(
-                                    width = 2.dp,
-                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
-                                    shape = CircleShape
-                                )
-                                .padding(2.dp)
-                        ) {
-                            Image(
-                                painter = rememberAsyncImagePainter(R.drawable.profile_1),
-                                contentDescription = "Profile",
+                    state.imagePath?.let { imagePath ->
+                        val profileImagePath = when (imagePath) {
+                            1 -> R.drawable.profile_2
+                            2 -> R.drawable.profile_3
+                            3 -> R.drawable.profile_4
+                            4 -> R.drawable.profile_4
+                            5 -> R.drawable.profile_5
+                            else -> R.drawable.profile_2
+                        }
+                        IconButton(onClick = { action(DashboardAction.NavigateToProfile) }) {
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
+                                    .size(42.dp)
+                                    .border(
+                                        width = 2.dp,
+                                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
+                                        shape = CircleShape
+                                    )
+                                    .padding(2.dp)
+                            ) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(profileImagePath),
+                                    contentDescription = "Profile",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         }
                     }
                 },

@@ -2,11 +2,17 @@ package com.ralphmarondev.velora.features.dashboard.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,15 +25,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.ralphmarondev.velora.R
+import com.ralphmarondev.velora.core.domain.model.TrafficRecord
 import org.koin.compose.viewmodel.koinViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun DashboardScreenRoot(
@@ -111,18 +120,109 @@ fun DashboardScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = "Velora Dashboard. ${state.message}",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
+                item {
+                    TrafficStatusCard(trafficRecord = state.trafficRecord)
+                }
+                item {
+                    ConstructionStatusCard(trafficRecord = state.trafficRecord)
+                }
+                item {
+                    LastUpdatedCard(
+                        timestamp = state.trafficRecord.timestamp
+                    )
+                }
             }
+        }
+    }
+}
+
+@Composable
+fun TrafficStatusCard(
+    trafficRecord: TrafficRecord
+) {
+    Card {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+
+            Text(
+                "Traffic Status",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = if (trafficRecord.isCongested)
+                    "🚦 Heavy Traffic Detected"
+                else
+                    "✅ Road is Clear",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+    }
+}
+
+@Composable
+fun ConstructionStatusCard(
+    trafficRecord: TrafficRecord
+) {
+    Card {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+
+            Text(
+                "Road Construction",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = if (trafficRecord.isUnderConstruction)
+                    "🚧 Ongoing Road Construction"
+                else
+                    "✅ No Ongoing Construction",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+    }
+}
+
+@Composable
+fun LastUpdatedCard(
+    timestamp: Long
+) {
+    val formatter = remember {
+        SimpleDateFormat(
+            "MMM dd, yyyy • hh:mm:ss a",
+            Locale.getDefault()
+        )
+    }
+
+    Card {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+
+            Text(
+                "Last Updated",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                formatter.format(Date(timestamp)),
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }

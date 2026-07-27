@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ralphmarondev.velora.features.account.domain.repository.AccountRepository
+import com.ralphmarondev.velora.features.dashboard.model.repository.DashboardRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DashboardViewModel(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val dashboardRepository: DashboardRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -19,6 +21,7 @@ class DashboardViewModel(
 
     init {
         loadInformation()
+        observeTrafficRecord()
     }
 
     fun onAction(action: DashboardAction) {
@@ -55,6 +58,22 @@ class DashboardViewModel(
                     it.copy(isLoading = false, isRefreshing = false)
                 }
             }
+        }
+    }
+
+    private fun observeTrafficRecord() {
+        viewModelScope.launch {
+            dashboardRepository
+                .observeLatestTrafficRecord()
+                .collect { trafficRecord ->
+                    trafficRecord?.let {
+                        _state.update { state ->
+                            state.copy(
+                                trafficRecord = it
+                            )
+                        }
+                    }
+                }
         }
     }
 }

@@ -66,6 +66,7 @@ class DashboardViewModel(
             dashboardRepository
                 .observeLatestTrafficRecord()
                 .collect { trafficRecord ->
+                    Log.d("DashboardVM", "Traffic: $trafficRecord")
                     trafficRecord?.let {
                         _state.update { state ->
                             state.copy(

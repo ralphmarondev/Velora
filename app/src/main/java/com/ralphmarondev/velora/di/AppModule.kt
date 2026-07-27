@@ -20,7 +20,7 @@ val appModule = module {
 
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
-    single { FirebaseDatabase.getInstance() }
+    single { FirebaseDatabase.getInstance("https://project-velora-default-rtdb.asia-southeast1.firebasedatabase.app") }
     singleOf(::NotificationHelper)
     singleOf(::TrafficListener)
 }

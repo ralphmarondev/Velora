@@ -1,0 +1,13 @@
+background:
+    - show notification when:
+        - trafficRecord.isCongest = true
+        - trafficRecord.isUnderConstructure = true
+
+foreground:
+    - show maps on dashboard
+    - show the shortest map to location avoiding our test location when:
+        - trafficRecord.isCongest = true
+        - trafficRecord.isUnderConstructure = true
+
+nice_to_have:
+    - update [account-feature] for personalization and customization

@@ -15,6 +15,7 @@ import com.ralphmarondev.velora.core.presentation.theme.ThemeProvider
 import com.ralphmarondev.velora.core.presentation.theme.VeloraTheme
 import com.ralphmarondev.velora.navigation.AppNavigation
 import com.ralphmarondev.velora.navigation.Routes
+import com.ralphmarondev.velora.receiver.NotificationHelper
 import kotlinx.coroutines.flow.first
 import org.koin.android.ext.android.inject
 
@@ -25,6 +26,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        NotificationHelper(this).createNotificationChannel()
+
         setContent {
             ThemeProvider(preferences = preferences) {
                 val themeState = LocalThemeState.current

@@ -1,4 +1,4 @@
-package com.ralphmarondev.velora.features.dashboard.model.repository
+package com.ralphmarondev.velora.features.dashboard.domain.repository
 
 import com.ralphmarondev.velora.core.domain.model.TrafficRecord
 import kotlinx.coroutines.flow.Flow

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ralphmarondev.velora.features.account.domain.repository.AccountRepository
-import com.ralphmarondev.velora.features.dashboard.model.repository.DashboardRepository
+import com.ralphmarondev.velora.features.dashboard.domain.repository.DashboardRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

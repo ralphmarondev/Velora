@@ -41,6 +41,10 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Routes.Auth
                     }
+                    NotificationHelper(this@MainActivity).showNotification(
+                        title = "Velora Notification",
+                        message = "Traffic may occur. Please consider re-routing!"
+                    )
                 }
 
                 VeloraTheme(darkTheme = darkTheme) {

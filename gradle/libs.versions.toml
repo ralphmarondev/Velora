@@ -5,6 +5,8 @@ coreKtx = "1.17.0"
 lifecycleRuntimeKtx = "2.9.4"
 activityCompose = "1.11.0"
 composeBom = "2025.10.00"
+mapsCompose = "6.2.1"
+playServicesMaps = "19.2.0"
 materialIconsExtendedAndroid = "1.7.8"
 coilCompose = "2.7.0"
 datastorePreferences = "1.1.7"
@@ -28,6 +30,8 @@ androidx-material-icons-extended-android = { module = "androidx.compose.material
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastorePreferences" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
@@ -59,4 +63,8 @@ firebase = [
     "firebase-storage",
     "firebase-database",
     "kotlinx-coroutines-play-services"
+]
+maps = [
+    "play-services-maps",
+    "maps-compose"
 ]

@@ -1,5 +1,6 @@
 package com.ralphmarondev.velora.features.dashboard.presentation
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -31,6 +33,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.ralphmarondev.velora.R
 import com.ralphmarondev.velora.core.domain.model.TrafficRecord
 import org.koin.compose.viewmodel.koinViewModel
@@ -60,7 +68,7 @@ fun DashboardScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(
+private fun DashboardScreen(
     state: DashboardState,
     action: (DashboardAction) -> Unit
 ) {
@@ -137,13 +145,48 @@ fun DashboardScreen(
                         timestamp = state.trafficRecord.timestamp
                     )
                 }
+                item {
+                    GoogleMapComponent()
+                }
+            }
+        }
+    }
+}
+
+@SuppressLint("UnrememberedMutableState")
+@Composable
+private fun GoogleMapComponent() {
+    val smDowntown = LatLng(17.6137, 121.7267)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(
+            smDowntown, 16f
+        )
+    }
+    Card {
+        Column {
+            Text(
+                text = "Traffic Location",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            GoogleMap(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp),
+                cameraPositionState = cameraPositionState
+            ) {
+                Marker(
+                    state = MarkerState(smDowntown),
+                    title = "SM Center Tuguegarao Downtown"
+                )
             }
         }
     }
 }
 
 @Composable
-fun TrafficStatusCard(
+private fun TrafficStatusCard(
     trafficRecord: TrafficRecord
 ) {
     Card {
@@ -170,7 +213,7 @@ fun TrafficStatusCard(
 }
 
 @Composable
-fun ConstructionStatusCard(
+private fun ConstructionStatusCard(
     trafficRecord: TrafficRecord
 ) {
     Card {
@@ -197,7 +240,7 @@ fun ConstructionStatusCard(
 }
 
 @Composable
-fun LastUpdatedCard(
+private fun LastUpdatedCard(
     timestamp: Long
 ) {
     val formatter = remember {

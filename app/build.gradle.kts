@@ -25,6 +25,8 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        manifestPlaceholders["MAPS_API_KEY"] = localProperties["MAPS_API_KEY"]?.toString() ?: ""
     }
 
     signingConfigs {
@@ -82,5 +84,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.bundles.koin)
     implementation(libs.bundles.firebase)
+    implementation(libs.bundles.maps)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

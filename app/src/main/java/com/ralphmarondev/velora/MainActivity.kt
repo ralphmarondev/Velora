@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.first
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
-
     private val preferences: AppPreferences by inject()
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -39,7 +38,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,10 +61,6 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Routes.Auth
                     }
-                    NotificationHelper(this@MainActivity).showNotification(
-                        title = "Velora Notification",
-                        message = "Traffic may occur. Please consider re-routing!"
-                    )
                 }
 
                 VeloraTheme(darkTheme = darkTheme) {
@@ -94,6 +88,5 @@ class MainActivity : ComponentActivity() {
         if (permissions.isNotEmpty()) {
             permissionLauncher.launch(permissions.toTypedArray())
         }
-
     }
 }

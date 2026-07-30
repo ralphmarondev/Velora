@@ -6,18 +6,23 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Construction
+import androidx.compose.material.icons.rounded.Traffic
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -27,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -42,9 +46,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.ralphmarondev.velora.R
 import com.ralphmarondev.velora.core.domain.model.TrafficRecord
 import org.koin.compose.viewmodel.koinViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun DashboardScreenRoot(
@@ -128,26 +129,27 @@ private fun DashboardScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(16.dp)
             ) {
-                item {
-                    TrafficStatusCard(trafficRecord = state.trafficRecord)
-                }
-                item {
-                    ConstructionStatusCard(trafficRecord = state.trafficRecord)
-                }
-                item {
-                    LastUpdatedCard(
-                        timestamp = state.trafficRecord.timestamp
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    TrafficConditionCard(
+                        modifier = Modifier.weight(1f),
+                        trafficRecord = state.trafficRecord
+                    )
+                    RoadConstructionCard(
+                        modifier = Modifier.weight(1f),
+                        trafficRecord = state.trafficRecord
                     )
                 }
-                item {
-                    GoogleMapComponent()
-                }
+                Spacer(modifier = Modifier.height(16.dp))
+                GoogleMapComponent()
             }
         }
     }
@@ -162,109 +164,90 @@ private fun GoogleMapComponent() {
             smDowntown, 16f
         )
     }
-    Card {
-        Column {
-            Text(
-                text = "Traffic Location",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            GoogleMap(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp),
-                cameraPositionState = cameraPositionState
-            ) {
-                Marker(
-                    state = MarkerState(smDowntown),
-                    title = "SM Center Tuguegarao Downtown"
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TrafficStatusCard(
-    trafficRecord: TrafficRecord
-) {
-    Card {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-
-            Text(
-                "Traffic Status",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = if (trafficRecord.isCongested)
-                    "🚦 Heavy Traffic Detected"
-                else
-                    "✅ Road is Clear",
-                style = MaterialTheme.typography.headlineSmall
-            )
-        }
-    }
-}
-
-@Composable
-private fun ConstructionStatusCard(
-    trafficRecord: TrafficRecord
-) {
-    Card {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-
-            Text(
-                "Road Construction",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = if (trafficRecord.isUnderConstruction)
-                    "🚧 Ongoing Road Construction"
-                else
-                    "✅ No Ongoing Construction",
-                style = MaterialTheme.typography.headlineSmall
-            )
-        }
-    }
-}
-
-@Composable
-private fun LastUpdatedCard(
-    timestamp: Long
-) {
-    val formatter = remember {
-        SimpleDateFormat(
-            "MMM dd, yyyy • hh:mm:ss a",
-            Locale.getDefault()
+    GoogleMap(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp)),
+        cameraPositionState = cameraPositionState
+    ) {
+        Marker(
+            state = MarkerState(smDowntown),
+            title = "SM Center Tuguegarao Downtown"
         )
     }
+}
 
-    Card {
+@Composable
+private fun TrafficConditionCard(
+    trafficRecord: TrafficRecord,
+    modifier: Modifier = Modifier
+) {
+    OutlinedCard(
+        modifier = modifier
+    ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-
-            Text(
-                "Last Updated",
-                style = MaterialTheme.typography.titleMedium
+            Icon(
+                imageVector = Icons.Rounded.Traffic,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(32.dp)
             )
-
-            Spacer(Modifier.height(8.dp))
-
+            Spacer(Modifier.height(12.dp))
             Text(
-                formatter.format(Date(timestamp)),
-                style = MaterialTheme.typography.bodyLarge
+                text = "Traffic",
+                style = MaterialTheme.typography.labelMedium
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = if (trafficRecord.isCongested)
+                    "Heavy"
+                else
+                    "Clear",
+                style = MaterialTheme.typography.titleLarge,
+                color = if (trafficRecord.isCongested)
+                    MaterialTheme.colorScheme.error
+                else
+                    MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun RoadConstructionCard(
+    trafficRecord: TrafficRecord,
+    modifier: Modifier = Modifier
+) {
+    OutlinedCard(
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Construction,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.size(32.dp)
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = "Construction",
+                style = MaterialTheme.typography.labelMedium
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = if (trafficRecord.isUnderConstruction)
+                    "Active"
+                else
+                    "None",
+                style = MaterialTheme.typography.titleLarge,
+                color = if (trafficRecord.isUnderConstruction)
+                    MaterialTheme.colorScheme.tertiary
+                else
+                    MaterialTheme.colorScheme.primary
             )
         }
     }

@@ -1,5 +1,4 @@
 foreground:
-    - show maps on dashboard
     - show the shortest map to location avoiding our test location when:
         - trafficRecord.isCongest = true
         - trafficRecord.isUnderConstructure = true

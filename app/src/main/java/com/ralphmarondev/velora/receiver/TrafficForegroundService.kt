@@ -38,7 +38,7 @@ class TrafficForegroundService : Service() {
             NotificationHelper.CHANNEL_ID
         )
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Velora")
+            .setContentTitle("TugueGARAW")
             .setContentText("Monitoring traffic...")
             .setOngoing(true)
             .build()

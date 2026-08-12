@@ -1,6 +1,5 @@
 package com.ralphmarondev.velora.features.dashboard.presentation
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Construction
 import androidx.compose.material.icons.rounded.Traffic
@@ -37,14 +35,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
 import com.ralphmarondev.velora.R
 import com.ralphmarondev.velora.core.domain.model.TrafficRecord
+import com.ralphmarondev.velora.features.dashboard.presentation.component.GoogleMapComponent
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -152,28 +145,6 @@ private fun DashboardScreen(
                 GoogleMapComponent()
             }
         }
-    }
-}
-
-@SuppressLint("UnrememberedMutableState")
-@Composable
-private fun GoogleMapComponent() {
-    val smDowntown = LatLng(17.6137, 121.7267)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(
-            smDowntown, 16f
-        )
-    }
-    GoogleMap(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp)),
-        cameraPositionState = cameraPositionState
-    ) {
-        Marker(
-            state = MarkerState(smDowntown),
-            title = "SM Center Tuguegarao Downtown"
-        )
     }
 }
 

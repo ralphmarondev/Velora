@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.ralphmarondev.velora.features.account.presentation.change_image.ChangeImageScreenRoot
 import com.ralphmarondev.velora.features.account.presentation.profile.ProfileScreenRoot
 import com.ralphmarondev.velora.features.auth.presentation.login.LoginScreenRoot
 import com.ralphmarondev.velora.features.auth.presentation.register.RegisterScreenRoot
@@ -85,9 +86,14 @@ fun AppNavigation(
                         }
                     },
                     selectImage = {
-
+                        navController.navigate(Routes.ChangeImage) {
+                            launchSingleTop = true
+                        }
                     }
                 )
+            }
+            composable<Routes.ChangeImage> {
+                ChangeImageScreenRoot()
             }
         }
     }

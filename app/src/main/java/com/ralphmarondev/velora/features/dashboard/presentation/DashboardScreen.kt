@@ -60,7 +60,7 @@ fun DashboardScreenRoot(
     LaunchedEffect(state.navigateToCalendar) {
         if (state.navigateToCalendar) {
             navigateToCalendar()
-            viewModel.onAction(DashboardAction.NavigateToCalendar)
+            viewModel.onAction(DashboardAction.ClearNavigation)
         }
     }
 

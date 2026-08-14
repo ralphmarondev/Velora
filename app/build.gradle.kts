@@ -27,6 +27,11 @@ android {
         versionName = "1.0"
 
         manifestPlaceholders["MAPS_API_KEY"] = localProperties["MAPS_API_KEY"]?.toString() ?: ""
+        buildConfigField(
+            type = "String",
+            name = "MAPS_API_KEY",
+            value = "\"${localProperties["MAPS_API_KEY"]?.toString() ?: ""}\""
+        )
     }
 
     signingConfigs {
@@ -65,6 +70,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

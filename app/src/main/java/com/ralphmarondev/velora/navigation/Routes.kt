@@ -21,6 +21,9 @@ sealed interface Routes {
     data object Dashboard : Routes
 
     @Serializable
+    data object Calendar : Routes
+
+    @Serializable
     data object Account : Routes
 
     @Serializable

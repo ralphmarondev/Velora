@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.rounded.Construction
 import androidx.compose.material.icons.rounded.Traffic
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,7 +44,8 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DashboardScreenRoot(
-    navigateToProfile: () -> Unit
+    navigateToProfile: () -> Unit,
+    navigateToCalendar: () -> Unit
 ) {
     val viewModel: DashboardViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
@@ -51,6 +54,13 @@ fun DashboardScreenRoot(
         if (state.navigateToProfile) {
             navigateToProfile()
             viewModel.onAction(DashboardAction.ClearNavigation)
+        }
+    }
+
+    LaunchedEffect(state.navigateToCalendar) {
+        if (state.navigateToCalendar) {
+            navigateToCalendar()
+            viewModel.onAction(DashboardAction.NavigateToCalendar)
         }
     }
 
@@ -113,6 +123,14 @@ private fun DashboardScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { action(DashboardAction.NavigateToCalendar) }) {
+                Icon(
+                    imageVector = Icons.Outlined.DateRange,
+                    contentDescription = "Schedule trip"
+                )
+            }
         }
     ) { innerPadding ->
         PullToRefreshBox(

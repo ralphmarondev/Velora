@@ -8,5 +8,6 @@ data class DashboardState(
     val isRefreshing: Boolean = false,
     val imagePath: Int? = null,
     val navigateToProfile: Boolean = false,
+    val navigateToCalendar: Boolean = false,
     val trafficRecord: TrafficRecord = TrafficRecord()
 )

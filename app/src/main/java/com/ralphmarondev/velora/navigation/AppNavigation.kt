@@ -67,8 +67,16 @@ fun AppNavigation(
                         navController.navigate(Routes.Account) {
                             launchSingleTop = true
                         }
+                    },
+                    navigateToCalendar = {
+                        navController.navigate(Routes.Calendar) {
+                            launchSingleTop = true
+                        }
                     }
                 )
+            }
+            composable<Routes.Calendar> {
+
             }
         }
 

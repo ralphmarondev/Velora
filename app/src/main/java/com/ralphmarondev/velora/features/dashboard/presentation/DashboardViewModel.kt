@@ -27,6 +27,7 @@ class DashboardViewModel(
     fun onAction(action: DashboardAction) {
         when (action) {
             DashboardAction.NavigateToProfile -> navigateToProfile()
+            DashboardAction.NavigateToCalendar -> navigateToCalendar()
             DashboardAction.Refresh -> loadInformation(isRefreshing = true)
             DashboardAction.ClearNavigation -> clearNavigation()
         }
@@ -36,8 +37,17 @@ class DashboardViewModel(
         _state.update { it.copy(navigateToProfile = true) }
     }
 
+    private fun navigateToCalendar() {
+        _state.update { it.copy(navigateToCalendar = true) }
+    }
+
     private fun clearNavigation() {
-        _state.update { it.copy(navigateToProfile = false) }
+        _state.update {
+            it.copy(
+                navigateToProfile = false,
+                navigateToCalendar = false
+            )
+        }
     }
 
     private fun loadInformation(isRefreshing: Boolean = false) {

@@ -20,28 +20,33 @@ object DirectionUtils {
                     "&key=$apiKey"
 
             try {
+                Log.d("DirectionUtils", "Requesting URL: $url")
                 val response = URL(url).readText()
                 val json = JSONObject(response)
-                val routes = json.getJSONArray("routes")
 
-                if (routes.length() > 0) {
-                    val polylinePoints = routes.getJSONObject(0)
-                        .getJSONObject("overview_polyline")
-                        .getString("points")
-                    Log.d("DirectionUtils", "$polylinePoints")
-                    return@withContext decodePolyline(polylinePoints)
+                val status = json.optString("status")
+                Log.d("DirectionUtils", "API Response Status: $status")
+
+                if (status == "OK") {
+                    val routes = json.getJSONArray("routes")
+                    if (routes.length() > 0) {
+                        val polylinePoints = routes.getJSONObject(0)
+                            .getJSONObject("overview_polyline")
+                            .getString("points")
+                        return@withContext decodePolyline(polylinePoints)
+                    }
+                } else {
+                    val errorMsg = json.optString("error_message", "No error message provided")
+                    Log.e("DirectionUtils", "Google API Error [$status]: $errorMsg")
                 }
             } catch (e: Exception) {
-                Log.e("DirectionUtils", "${e.message}")
+                Log.e("DirectionUtils", "Exception fetching directions", e)
             }
 
             emptyList()
         }
     }
 
-    /**
-     * Decodes an encoded Google Maps Polyline string into a list of LatLng coordinates.
-     */
     private fun decodePolyline(encoded: String): List<LatLng> {
         val poly = mutableListOf<LatLng>()
         var index = 0

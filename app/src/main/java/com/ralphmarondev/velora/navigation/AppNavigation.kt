@@ -10,6 +10,7 @@ import com.ralphmarondev.velora.features.account.presentation.change_image.Chang
 import com.ralphmarondev.velora.features.account.presentation.profile.ProfileScreenRoot
 import com.ralphmarondev.velora.features.auth.presentation.login.LoginScreenRoot
 import com.ralphmarondev.velora.features.auth.presentation.register.RegisterScreenRoot
+import com.ralphmarondev.velora.features.calendar.presentation.CalendarScreenRoot
 import com.ralphmarondev.velora.features.dashboard.presentation.DashboardScreenRoot
 
 @Composable
@@ -76,7 +77,7 @@ fun AppNavigation(
                 )
             }
             composable<Routes.Calendar> {
-
+                CalendarScreenRoot()
             }
         }
 

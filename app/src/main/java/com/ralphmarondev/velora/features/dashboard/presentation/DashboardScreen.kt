@@ -142,7 +142,10 @@ private fun DashboardScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                GoogleMapComponent()
+                GoogleMapComponent(
+                    isTraffic = state.trafficRecord.isCongested,
+                    isUnderConstruction = state.trafficRecord.isUnderConstruction
+                )
             }
         }
     }

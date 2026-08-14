@@ -31,7 +31,7 @@ fun GoogleMapComponent(
     isUnderConstruction: Boolean = false
 ) {
     val cathedralCorner = remember { LatLng(17.6134, 121.7298) }
-    val mallOfTheValley = remember { LatLng(17.6162, 121.7285) }
+    val mallOfTheValley = remember { LatLng(17.614390109528323, 121.7277353658289) }
 
     var routeToMov by remember { mutableStateOf<List<LatLng>>(emptyList()) }
 

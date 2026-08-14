@@ -11,12 +11,21 @@ object DirectionUtils {
     suspend fun getRoutePoints(
         origin: LatLng,
         destination: LatLng,
-        apiKey: String
+        apiKey: String,
+        waypoints: List<LatLng> = emptyList(),
+        mode: String = "driving"
     ): List<LatLng> {
         return withContext(Dispatchers.IO) {
+            val waypointsParam = if (waypoints.isNotEmpty()) {
+                val formatted = waypoints.joinToString("|") { "${it.latitude},${it.longitude}" }
+                "&waypoints=via:$formatted"
+            } else ""
+
             val url = "https://maps.googleapis.com/maps/api/directions/json" +
                     "?origin=${origin.latitude},${origin.longitude}" +
                     "&destination=${destination.latitude},${destination.longitude}" +
+                    "&mode=$mode" +
+                    waypointsParam +
                     "&key=$apiKey"
 
             try {
@@ -25,8 +34,6 @@ object DirectionUtils {
                 val json = JSONObject(response)
 
                 val status = json.optString("status")
-                Log.d("DirectionUtils", "API Response Status: $status")
-
                 if (status == "OK") {
                     val routes = json.getJSONArray("routes")
                     if (routes.length() > 0) {

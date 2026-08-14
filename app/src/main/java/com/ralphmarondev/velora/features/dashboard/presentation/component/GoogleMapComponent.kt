@@ -30,39 +30,49 @@ fun GoogleMapComponent(
     isTraffic: Boolean = false,
     isUnderConstruction: Boolean = false
 ) {
-    val cathedralCorner = remember { LatLng(17.6134, 121.7298) }
+    // Start at MOV, Destination is St. Peter Metropolitan Cathedral
     val mallOfTheValley = remember { LatLng(17.614390109528323, 121.7277353658289) }
+    val cathedralCorner = remember { LatLng(17.6134, 121.7298) }
 
-    var routeToMov by remember { mutableStateOf<List<LatLng>>(emptyList()) }
+    // Waypoint Landmark Coordinates
+    val jomarsWaypoint = remember { LatLng(17.6131, 121.7295) }    // Jomar's Batil Patung area
+    val hotelRomaWaypoint = remember { LatLng(17.6128, 121.7278) } // Hotel Roma area (Luna St)
 
-    LaunchedEffect(Unit) {
+    var routeToCathedral by remember { mutableStateOf<List<LatLng>>(emptyList()) }
+
+    LaunchedEffect(isTraffic, isUnderConstruction) {
         Log.d(
             "Dashboard",
-            "Fetching road path... Traffic: $isTraffic | Construction: $isUnderConstruction"
+            "Fetching route from MOV to Cathedral... Traffic: $isTraffic | Construction: $isUnderConstruction"
         )
 
+        // Select intermediate driving waypoint based on road condition toggles
+        val selectedWaypoint = if (isTraffic || isUnderConstruction) {
+            listOf(hotelRomaWaypoint) // Detour via Hotel Roma
+        } else {
+            listOf(jomarsWaypoint)    // Direct/default route via Jomar's
+        }
+
         val points = DirectionUtils.getRoutePoints(
-            origin = cathedralCorner,
-            destination = mallOfTheValley,
-            apiKey = BuildConfig.MAPS_API_KEY
+            origin = mallOfTheValley,
+            destination = cathedralCorner,
+            apiKey = BuildConfig.MAPS_API_KEY,
+            waypoints = selectedWaypoint,
+            mode = "driving"
         )
 
         if (points.isNotEmpty()) {
-            routeToMov = points
-            Log.d("Dashboard", "Road route loaded: ${points.size} points")
+            routeToCathedral = points
+            Log.d("Dashboard", "Driving route loaded: ${points.size} points")
         } else {
             Log.e("Dashboard", "Failed to fetch road points. Using fallback.")
+            routeToCathedral = listOf(mallOfTheValley) + selectedWaypoint + listOf(cathedralCorner)
         }
     }
 
-    val routeColor = when {
-        isUnderConstruction -> Color(0xFFE65100) // Orange
-        isTraffic -> Color(0xFFD32F2F)            // Red
-        else -> Color(0xFF2E7D32)                 // Green
-    }
-
+    val routeColor = Color(0xFF2E7D32)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(cathedralCorner, 16f)
+        position = CameraPosition.fromLatLngZoom(mallOfTheValley, 16f)
     }
 
     GoogleMap(
@@ -72,18 +82,19 @@ fun GoogleMapComponent(
         cameraPositionState = cameraPositionState
     ) {
         Marker(
-            state = MarkerState(position = cathedralCorner),
-            title = "St. Peter Metropolitan Cathedral (Corner)",
-            snippet = "Rizal St / Corner, Tuguegarao City"
-        )
-        Marker(
             state = MarkerState(position = mallOfTheValley),
             title = "Mall of the Valley (MOV)",
-            snippet = "Tuguegarao City, Cagayan"
+            snippet = "Starting Point"
         )
-        if (routeToMov.isNotEmpty()) {
+        Marker(
+            state = MarkerState(position = cathedralCorner),
+            title = "St. Peter Metropolitan Cathedral",
+            snippet = "Target Destination"
+        )
+
+        if (routeToCathedral.isNotEmpty()) {
             Polyline(
-                points = routeToMov,
+                points = routeToCathedral,
                 color = routeColor,
                 width = 12f
             )

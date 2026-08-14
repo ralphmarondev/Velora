@@ -16,7 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
@@ -34,9 +37,16 @@ fun GoogleMapComponent(
     val mallOfTheValley = remember { LatLng(17.614390109528323, 121.7277353658289) }
     val cathedralCorner = remember { LatLng(17.6134, 121.7298) }
 
-    // Waypoint Landmark Coordinates
-    val jomarsWaypoint = remember { LatLng(17.6131, 121.7295) }    // Jomar's Batil Patung area
-    val hotelRomaWaypoint = remember { LatLng(17.6128, 121.7278) } // Hotel Roma area (Luna St)
+    val centerPoint = remember { LatLng(17.6139, 121.7288) }
+    val tuguegaraoBounds = remember {
+        LatLngBounds(
+            LatLng(17.6050, 121.7200),
+            LatLng(17.6250, 121.7400)
+        )
+    }
+
+    val jomarsWaypoint = remember { LatLng(17.6131, 121.7295) }
+    val hotelRomaWaypoint = remember { LatLng(17.6128, 121.7278) }
 
     var routeToCathedral by remember { mutableStateOf<List<LatLng>>(emptyList()) }
 
@@ -46,11 +56,10 @@ fun GoogleMapComponent(
             "Fetching route from MOV to Cathedral... Traffic: $isTraffic | Construction: $isUnderConstruction"
         )
 
-        // Select intermediate driving waypoint based on road condition toggles
         val selectedWaypoint = if (isTraffic || isUnderConstruction) {
-            listOf(hotelRomaWaypoint) // Detour via Hotel Roma
+            listOf(hotelRomaWaypoint)
         } else {
-            listOf(jomarsWaypoint)    // Direct/default route via Jomar's
+            listOf(jomarsWaypoint)
         }
 
         val points = DirectionUtils.getRoutePoints(
@@ -72,14 +81,29 @@ fun GoogleMapComponent(
 
     val routeColor = Color(0xFF2E7D32)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(mallOfTheValley, 16f)
+        position = CameraPosition.fromLatLngZoom(centerPoint, 17.5f)
+    }
+    val mapProperties = remember {
+        MapProperties(
+            latLngBoundsForCameraTarget = tuguegaraoBounds,
+            minZoomPreference = 15.0f,
+            maxZoomPreference = 20.0f
+        )
+    }
+    val uiSettings = remember {
+        MapUiSettings(
+            zoomControlsEnabled = false,
+            myLocationButtonEnabled = false
+        )
     }
 
     GoogleMap(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp)),
-        cameraPositionState = cameraPositionState
+        cameraPositionState = cameraPositionState,
+        properties = mapProperties,
+        uiSettings = uiSettings
     ) {
         Marker(
             state = MarkerState(position = mallOfTheValley),

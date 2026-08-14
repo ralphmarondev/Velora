@@ -66,6 +66,7 @@ fun ProfileScreenRoot(
     LaunchedEffect(state.selectImage) {
         if (state.selectImage) {
             selectImage()
+            viewModel.onAction(ProfileAction.ClearNavigation)
         }
     }
 

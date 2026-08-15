@@ -4,3 +4,5 @@ picamera2==0.3.36
 numpy==2.2.4
 python-dotenv==1.0.1
 requests==2.32.3
+libcamera
+rpi-libcamera

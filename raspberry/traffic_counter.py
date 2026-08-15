@@ -31,7 +31,6 @@ HIGH_COUNT = 3     # Number of vehicles for "high" traffic (congested)
 # Time thresholds (in seconds)
 POLICE_SECONDS = 600        # 10 minutes - police must be present this long
 ROADWORK_HOLD_SECONDS = 30  # Hold roadwork state for 30 seconds after last detection
-STATUS_SEND_SECONDS = 30    # Send status update every 30 seconds
 EVENT_COOLDOWN_SECONDS = 300  # 5 minutes cooldown between events
 
 # Model confidence threshold
@@ -101,7 +100,6 @@ class FirebaseTrafficWriter:
         is_under_construction = data.get("roadwork_detected", False)
         
         # ONLY send if there's a change in state (traffic or construction)
-        # This prevents unnecessary updates
         current_state = {
             "isCongested": is_congested,
             "isUnderConstruction": is_under_construction
@@ -118,7 +116,7 @@ class FirebaseTrafficWriter:
             "timestamp": int(time.time() * 1000)
         }
         
-        logging.info(f"Attempting to write to Firebase: {firebase_record}")
+        logging.info(f"STATE CHANGE DETECTED! Sending to Firebase: {firebase_record}")
         
         # Use PATCH to update specific fields
         response = requests.patch(
@@ -154,9 +152,8 @@ class RoadMonitor:
         self.police_first_seen: dict[int, float] = {}
         self.last_roadwork_seen = 0.0
         self.last_event_at = 0.0
-        self.last_status_at = 0.0
         self.firebase = self._make_firebase_writer()
-        self.last_congested_state = False  # Track last state for event cooldown
+        self.last_congested_state = False
         self.last_construction_state = False
 
     def _make_firebase_writer(self) -> FirebaseTrafficWriter | None:
@@ -235,10 +232,8 @@ class RoadMonitor:
         # Use constants for thresholds
         load = "high" if total >= self.args.high_count else "medium" if total >= self.args.medium_count else "low"
         
-        # Determine congestion state
-        is_congested = load == "high"  # Simple: high traffic = congested
-        # Alternative: require roadwork and police
-        # is_congested = load == "high" and roadwork_active and police_persistent
+        # Determine congestion state - simple: high traffic = congested
+        is_congested = load == "high"
         
         payload = {
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
@@ -264,22 +259,16 @@ class RoadMonitor:
         cv2.putText(frame, f"Roadwork: {data['roadwork_detected']}  Police: {data['police_present_seconds']}s",
                     (12, 58), cv2.FONT_HERSHEY_SIMPLEX, .6, (0, 255, 0), 2)
         if data["incident_suspected"]:
-            cv2.putText(frame, "CONGESTION DETECTED", (12, 88),
+            cv2.putText(frame, "INCIDENT / CONGESTION SUSPECTED", (12, 88),
                         cv2.FONT_HERSHEY_SIMPLEX, .65, (0, 0, 255), 2)
         return frame
 
     def send(self, data: dict, force: bool = False):
-        """Send data to Firebase and webhook. Only sends if state changed or forced."""
-        now = time.monotonic()
-        
-        # Rate limiting for status updates
-        if not force and now - self.last_status_at < self.args.status_seconds:
-            return
-        
+        """Send data to Firebase immediately when state changes."""
         sent = False
         try:
             if self.firebase:
-                # This will return True only if data was actually sent
+                # This will return True only if data was actually sent (state changed)
                 sent = self.firebase.write(data)
             
             if self.args.webhook_url:
@@ -288,8 +277,7 @@ class RoadMonitor:
                 sent = True
             
             if sent:
-                self.last_status_at = now
-                logging.info(f"Data sent successfully. Congested: {data['incident_suspected']}, Roadwork: {data['roadwork_detected']}")
+                logging.info(f"Data sent. Congested: {data['incident_suspected']}, Roadwork: {data['roadwork_detected']}")
             
         except requests.RequestException as exc:
             logging.warning("Could not send traffic status: %s", exc)
@@ -312,7 +300,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--high-count", type=int, default=HIGH_COUNT)
     parser.add_argument("--police-seconds", type=int, default=POLICE_SECONDS)
     parser.add_argument("--roadwork-hold-seconds", type=int, default=ROADWORK_HOLD_SECONDS)
-    parser.add_argument("--status-seconds", type=int, default=STATUS_SEND_SECONDS)
     parser.add_argument("--event-cooldown-seconds", type=int, default=EVENT_COOLDOWN_SECONDS)
     parser.add_argument("--no-preview", action="store_true")
     return parser.parse_args()
@@ -338,7 +325,7 @@ def main():
             # Picamera RGB needs conversion because OpenCV operations use BGR.
             frame = cv2.cvtColor(camera.capture_array(), cv2.COLOR_RGB2BGR)
             data, rendered = monitor.analyse(frame, time.monotonic())
-            monitor.send(data)
+            monitor.send(data)  # Sends immediately if state changed
             
             # Log summary every 10 frames
             frame_count += 1

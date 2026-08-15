@@ -23,6 +23,25 @@ from dotenv import load_dotenv
 from picamera2 import Picamera2
 from ultralytics import YOLO
 
+# ==================== CONFIGURATION CONSTANTS ====================
+# Traffic detection thresholds
+MEDIUM_COUNT = 2   # Number of vehicles for "medium" traffic
+HIGH_COUNT = 3     # Number of vehicles for "high" traffic (congested)
+
+# Time thresholds (in seconds)
+POLICE_SECONDS = 600        # 10 minutes - police must be present this long
+ROADWORK_HOLD_SECONDS = 30  # Hold roadwork state for 30 seconds after last detection
+STATUS_SEND_SECONDS = 30    # Send status update every 30 seconds
+EVENT_COOLDOWN_SECONDS = 300  # 5 minutes cooldown between events
+
+# Model confidence threshold
+CONFIDENCE_THRESHOLD = 0.40
+
+# Camera resolution
+CAMERA_WIDTH = 1280
+CAMERA_HEIGHT = 720
+
+# ==================== END CONFIGURATION ====================
 
 # COCO labels in yolo26n.pt ("tricycle" is not a standard COCO class).
 VEHICLE_NAMES = {"car", "motorcycle", "bus", "truck", "tricycle", "trycicle"}
@@ -59,6 +78,7 @@ class FirebaseTrafficWriter:
         self.email = email
         self.password = password
         self.id_token: str | None = None
+        self.last_sent_state: dict = {}  # Track last sent state to avoid duplicates
 
     def sign_in(self) -> None:
         response = requests.post(
@@ -71,19 +91,36 @@ class FirebaseTrafficWriter:
         self.id_token = response.json()["idToken"]
         logging.info("Signed in to Firebase.")
 
-    def write(self, data: dict) -> None:
+    def write(self, data: dict) -> bool:
+        """Write to Firebase. Returns True if data was sent, False if skipped."""
         if not self.id_token:
             self.sign_in()
         
         # Create the payload exactly as required
+        is_congested = data.get("incident_suspected", False)
+        is_under_construction = data.get("roadwork_detected", False)
+        
+        # ONLY send if there's a change in state (traffic or construction)
+        # This prevents unnecessary updates
+        current_state = {
+            "isCongested": is_congested,
+            "isUnderConstruction": is_under_construction
+        }
+        
+        # Check if state changed from last send
+        if self.last_sent_state == current_state:
+            logging.debug("State unchanged, skipping Firebase update")
+            return False
+        
         firebase_record = {
-            "isCongested": data.get("incident_suspected", False),
-            "isUnderConstruction": data.get("roadwork_detected", False),
+            "isCongested": is_congested,
+            "isUnderConstruction": is_under_construction,
             "timestamp": int(time.time() * 1000)
         }
+        
         logging.info(f"Attempting to write to Firebase: {firebase_record}")
         
-        # Use PATCH instead of PUT to update specific fields without overwriting the entire path
+        # Use PATCH to update specific fields
         response = requests.patch(
             f"{self.database_url}/traffic.json",
             params={"auth": self.id_token}, 
@@ -101,8 +138,12 @@ class FirebaseTrafficWriter:
                 json=firebase_record, 
                 timeout=10,
             )
+        
         response.raise_for_status()
+        self.last_sent_state = current_state
         logging.info(f"Successfully wrote to Firebase: {firebase_record}")
+        return True
+
 
 class RoadMonitor:
     def __init__(self, args: argparse.Namespace):
@@ -115,6 +156,8 @@ class RoadMonitor:
         self.last_event_at = 0.0
         self.last_status_at = 0.0
         self.firebase = self._make_firebase_writer()
+        self.last_congested_state = False  # Track last state for event cooldown
+        self.last_construction_state = False
 
     def _make_firebase_writer(self) -> FirebaseTrafficWriter | None:
         if not self.args.firebase:
@@ -188,7 +231,15 @@ class RoadMonitor:
         police_persistent = police_duration >= self.args.police_seconds
         vehicle_counts = {name: len(counts[name]) for name in sorted(VEHICLE_NAMES - {"trycicle"})}
         total = sum(vehicle_counts.values())
+        
+        # Use constants for thresholds
         load = "high" if total >= self.args.high_count else "medium" if total >= self.args.medium_count else "low"
+        
+        # Determine congestion state
+        is_congested = load == "high"  # Simple: high traffic = congested
+        # Alternative: require roadwork and police
+        # is_congested = load == "high" and roadwork_active and police_persistent
+        
         payload = {
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "vehicle_counts": vehicle_counts,
@@ -197,9 +248,9 @@ class RoadMonitor:
             "roadwork_detected": roadwork_active,
             "police_present_seconds": round(police_duration),
             "police_persistent": police_persistent,
-            # Main condition requested: traffic is high AND roadwork AND long police presence.
-            "incident_suspected": load == "high" and roadwork_active and police_persistent,
+            "incident_suspected": is_congested,  # This maps to isCongested in Firebase
         }
+        
         rendered = self.draw(frame.copy(), vehicle_result, custom_result, payload)
         return payload, rendered
 
@@ -213,25 +264,33 @@ class RoadMonitor:
         cv2.putText(frame, f"Roadwork: {data['roadwork_detected']}  Police: {data['police_present_seconds']}s",
                     (12, 58), cv2.FONT_HERSHEY_SIMPLEX, .6, (0, 255, 0), 2)
         if data["incident_suspected"]:
-            cv2.putText(frame, "INCIDENT / CONGESTION SUSPECTED", (12, 88),
+            cv2.putText(frame, "CONGESTION DETECTED", (12, 88),
                         cv2.FONT_HERSHEY_SIMPLEX, .65, (0, 0, 255), 2)
         return frame
 
     def send(self, data: dict, force: bool = False):
+        """Send data to Firebase and webhook. Only sends if state changed or forced."""
         now = time.monotonic()
+        
+        # Rate limiting for status updates
         if not force and now - self.last_status_at < self.args.status_seconds:
             return
+        
         sent = False
         try:
             if self.firebase:
-                self.firebase.write(data)
-                sent = True
+                # This will return True only if data was actually sent
+                sent = self.firebase.write(data)
+            
             if self.args.webhook_url:
                 response = requests.post(self.args.webhook_url, json=data, timeout=5)
                 response.raise_for_status()
                 sent = True
+            
             if sent:
                 self.last_status_at = now
+                logging.info(f"Data sent successfully. Congested: {data['incident_suspected']}, Roadwork: {data['roadwork_detected']}")
+            
         except requests.RequestException as exc:
             logging.warning("Could not send traffic status: %s", exc)
 
@@ -245,16 +304,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--firebase", action="store_true", help="Write directly to Firebase Realtime Database")
     parser.add_argument("--firebase-database-url", default=os.getenv("FIREBASE_DATABASE_URL"),
                         help="Firebase database URL (normally placed in .env)")
-    parser.add_argument("--confidence", type=float, default=.40)
-    parser.add_argument("--width", type=int, default=1280)
-    parser.add_argument("--height", type=int, default=720)
+    parser.add_argument("--confidence", type=float, default=CONFIDENCE_THRESHOLD)
+    parser.add_argument("--width", type=int, default=CAMERA_WIDTH)
+    parser.add_argument("--height", type=int, default=CAMERA_HEIGHT)
     parser.add_argument("--roi", help="JSON polygon defining the monitored road area")
-    parser.add_argument("--medium-count", type=int, default=5)
-    parser.add_argument("--high-count", type=int, default=10)
-    parser.add_argument("--police-seconds", type=int, default=600, help="10 min; set 1200 for 20 min")
-    parser.add_argument("--roadwork-hold-seconds", type=int, default=30)
-    parser.add_argument("--status-seconds", type=int, default=30)
-    parser.add_argument("--event-cooldown-seconds", type=int, default=300)
+    parser.add_argument("--medium-count", type=int, default=MEDIUM_COUNT)
+    parser.add_argument("--high-count", type=int, default=HIGH_COUNT)
+    parser.add_argument("--police-seconds", type=int, default=POLICE_SECONDS)
+    parser.add_argument("--roadwork-hold-seconds", type=int, default=ROADWORK_HOLD_SECONDS)
+    parser.add_argument("--status-seconds", type=int, default=STATUS_SEND_SECONDS)
+    parser.add_argument("--event-cooldown-seconds", type=int, default=EVENT_COOLDOWN_SECONDS)
     parser.add_argument("--no-preview", action="store_true")
     return parser.parse_args()
 
@@ -262,18 +321,33 @@ def parse_args() -> argparse.Namespace:
 def main():
     args = parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    
+    logging.info("=== TRAFFIC MONITOR STARTING ===")
+    logging.info(f"Medium count: {args.medium_count}, High count: {args.high_count}")
+    logging.info(f"Police threshold: {args.police_seconds}s, Roadwork hold: {args.roadwork_hold_seconds}s")
+    
     monitor = RoadMonitor(args)
     camera = Picamera2()
     camera.configure(camera.create_video_configuration(main={"size": (args.width, args.height), "format": "RGB888"}))
     camera.start()
-    logging.info("Started. Press q in the preview window to stop.")
+    logging.info("Camera started. Press q in the preview window to stop.")
+    
     try:
+        frame_count = 0
         while True:
             # Picamera RGB needs conversion because OpenCV operations use BGR.
             frame = cv2.cvtColor(camera.capture_array(), cv2.COLOR_RGB2BGR)
             data, rendered = monitor.analyse(frame, time.monotonic())
             monitor.send(data)
-            logging.info(json.dumps(data))
+            
+            # Log summary every 10 frames
+            frame_count += 1
+            if frame_count % 10 == 0:
+                logging.info(f"Frame {frame_count}: Vehicles={data['vehicle_total']}, "
+                           f"Load={data['traffic_load']}, "
+                           f"Congested={data['incident_suspected']}, "
+                           f"Roadwork={data['roadwork_detected']}")
+            
             if not args.no_preview:
                 cv2.imshow("Road monitor", rendered)
                 if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -281,9 +355,8 @@ def main():
     finally:
         camera.stop()
         cv2.destroyAllWindows()
+        logging.info("Traffic monitor stopped.")
 
 
 if __name__ == "__main__":
     main()
-
-

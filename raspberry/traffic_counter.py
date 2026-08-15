@@ -250,6 +250,7 @@ class RoadMonitor:
         return payload, rendered
 
     def draw(self, frame, vehicle_result, custom_result, data):
+        # plot() expects RGB format, which is what picamera2 provides
         frame = vehicle_result.plot(img=frame, labels=True, boxes=True)
         frame = custom_result.plot(img=frame, labels=True, boxes=True)
         if self.roi is not None:
@@ -322,8 +323,8 @@ def main():
     try:
         frame_count = 0
         while True:
-            # Picamera RGB needs conversion because OpenCV operations use BGR.
-            frame = cv2.cvtColor(camera.capture_array(), cv2.COLOR_RGB2BGR)
+            # Get frame from camera (already in RGB format, no conversion needed)
+            frame = camera.capture_array()
             data, rendered = monitor.analyse(frame, time.monotonic())
             monitor.send(data)  # Sends immediately if state changed
             

@@ -123,14 +123,6 @@ private fun DashboardScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { action(DashboardAction.NavigateToCalendar) }) {
-                Icon(
-                    imageVector = Icons.Outlined.DateRange,
-                    contentDescription = "Schedule trip"
-                )
-            }
         }
     ) { innerPadding ->
         PullToRefreshBox(

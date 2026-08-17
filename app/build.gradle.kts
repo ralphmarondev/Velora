@@ -23,7 +23,7 @@ android {
         applicationId = "com.ralphmarondev.velora"
         minSdk = 28
         targetSdk = 36
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         manifestPlaceholders["MAPS_API_KEY"] = localProperties["MAPS_API_KEY"]?.toString() ?: ""

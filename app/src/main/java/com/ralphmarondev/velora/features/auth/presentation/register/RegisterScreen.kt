@@ -106,7 +106,7 @@ private fun RegisterScreen(
             item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Get Started with Velora",
+                    text = "Get Started with TugueGARAW",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -125,7 +125,7 @@ private fun RegisterScreen(
                     onValueChange = { action(RegisterAction.DisplayNameChange(it)) },
                     leadingIconImageVector = Icons.Outlined.AccountTree,
                     labelText = "Display Name",
-                    placeHolderText = "Velora User",
+                    placeHolderText = "TugueGARAW User",
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,

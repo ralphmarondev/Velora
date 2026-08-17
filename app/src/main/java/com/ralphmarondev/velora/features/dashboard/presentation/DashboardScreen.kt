@@ -48,6 +48,10 @@ fun DashboardScreenRoot(
     val viewModel: DashboardViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.onAction(DashboardAction.LoadAccountInformation)
+    }
+
     LaunchedEffect(state.navigateToProfile) {
         if (state.navigateToProfile) {
             navigateToProfile()
@@ -85,12 +89,12 @@ private fun DashboardScreen(
                 actions = {
                     state.imagePath?.let { imagePath ->
                         val profileImagePath = when (imagePath) {
-                            1 -> R.drawable.profile_2
-                            2 -> R.drawable.profile_3
-                            3 -> R.drawable.profile_4
+                            1 -> R.drawable.profile_1
+                            2 -> R.drawable.profile_2
+                            3 -> R.drawable.profile_3
                             4 -> R.drawable.profile_4
                             5 -> R.drawable.profile_5
-                            else -> R.drawable.profile_2
+                            else -> R.drawable.profile_1
                         }
                         IconButton(onClick = { action(DashboardAction.NavigateToProfile) }) {
                             Box(

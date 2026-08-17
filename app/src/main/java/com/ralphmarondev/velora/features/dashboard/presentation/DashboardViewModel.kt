@@ -30,6 +30,7 @@ class DashboardViewModel(
             DashboardAction.NavigateToCalendar -> navigateToCalendar()
             DashboardAction.Refresh -> loadInformation(isRefreshing = true)
             DashboardAction.ClearNavigation -> clearNavigation()
+            DashboardAction.LoadAccountInformation -> loadInformation()
         }
     }
 

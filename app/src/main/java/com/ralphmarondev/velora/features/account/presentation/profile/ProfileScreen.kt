@@ -63,6 +63,10 @@ fun ProfileScreenRoot(
     val viewModel: ProfileViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.onAction(ProfileAction.LoadInformation)
+    }
+
     LaunchedEffect(state.selectImage) {
         if (state.selectImage) {
             selectImage()
@@ -212,12 +216,12 @@ private fun UserImage(
     modifier: Modifier = Modifier
 ) {
     val profileImagePath = when (imagePath) {
-        1 -> R.drawable.profile_2
-        2 -> R.drawable.profile_3
-        3 -> R.drawable.profile_4
+        1 -> R.drawable.profile_1
+        2 -> R.drawable.profile_2
+        3 -> R.drawable.profile_3
         4 -> R.drawable.profile_4
         5 -> R.drawable.profile_5
-        else -> R.drawable.profile_2
+        else -> R.drawable.profile_1
     }
     Image(
         painter = rememberAsyncImagePainter(profileImagePath),
